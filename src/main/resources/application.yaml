@@ -1,0 +1,27 @@
+spring:
+  application:
+    name=json-fetcher
+
+file:
+  posts:
+    path: "posts"
+
+jp:
+  url: "https://jsonplaceholder.typicode.com"
+  connect-timeout: 1s
+  read-timeout: 5s
+
+
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - loggers

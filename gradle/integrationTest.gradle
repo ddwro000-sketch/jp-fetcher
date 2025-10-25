@@ -1,0 +1,47 @@
+sourceSets {
+    integrationTest {
+        java {
+            srcDir 'src/integrationTest/java'
+        }
+        resources {
+            srcDir 'src/integrationTest/resources'
+        }
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+configurations {
+    integrationTestImplementation
+    integrationTestRuntimeOnly
+}
+
+def integrationTestTask = tasks.register('integrationTest', Test) {
+    group = 'verification'
+    useJUnitPlatform()
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    shouldRunAfter(project.tasks.named('componentTest'))
+}
+
+tasks.named('check') {
+    dependsOn(integrationTestTask)
+}
+
+dependencies {
+    integrationTestImplementation sourceSets.main.output
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    integrationTestImplementation "net.javacrumbs.json-unit:json-unit-assertj:${assertJVersion}"
+    integrationTestImplementation "commons-io:commons-io:${commonsIoVersion}"
+    integrationTestImplementation "org.wiremock:wiremock-standalone:${wiremockVersion}"
+    integrationTestImplementation "org.wiremock.integrations:wiremock-spring-boot:${wiremockIntegrationVersion}"
+}
+
+idea {
+    module {
+        testSources.from(sourceSets.integrationTest.java.srcDirs)
+        testResources.from(sourceSets.integrationTest.resources.srcDirs)
+    }
+}
