@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,7 @@ class FilePostMessageSink implements PostMessageSink {
     @Override
     public void accept(PostMessage postMessage) throws MessageSendingException {
         Map<String, Exception> failures = new HashMap<>();
-        postMessage.posts().parallelStream().forEach(post -> saveToFile(post, failures));
+        postMessage.posts().forEach(post -> saveToFile(post, failures));
 
         if (!failures.isEmpty()) {
             throw new MessageSendingException(failures);
@@ -35,9 +34,9 @@ class FilePostMessageSink implements PostMessageSink {
     }
 
     private void saveToFile(PostData post, Map<String, Exception> failures){
-        String fileName = "%s.json".formatted(post.id());
+        var fileName = "%s.json".formatted(post.id());
         try {
-            Path filePath = Paths.get(filePostMessageProperties.path(), fileName);
+            var filePath = Paths.get(filePostMessageProperties.path(), fileName);
             Files.createDirectories(filePath.getParent());
             objectMapper.writeValue(filePath.toFile(), post);
         } catch (IOException e){
